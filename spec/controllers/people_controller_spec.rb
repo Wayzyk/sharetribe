@@ -155,7 +155,12 @@ describe PeopleController, type: :controller do
       @community = FactoryGirl.create(:community)
       @request.host = "#{@community.ident}.lvh.me"
       @request.env[:current_marketplace] = @community
-      @person = FactoryGirl.create(:person, community_id: @community.id)
+      @location = FactoryGirl.create(:location)
+      @person = FactoryGirl.create(:person,
+                                   community_id: @community.id,
+                                   location: @location,
+                                   display_name: "A User",
+                                   description: "My bio.")
       @community.members << @person
       @id = @person.id
       @username = @person.username
@@ -168,7 +173,15 @@ describe PeopleController, type: :controller do
       delete :destroy, params: {:id => @username}
       expect(response.status).to eq(302)
 
-      expect(Person.find(@id).deleted?).to eql(true)
+      person = Person.find(@id)
+      expect(person.deleted?).to eql(true)
+      expect(person.username).to match(/deleted_\w+/)
+      expect(person.location).to be_nil
+      expect(person.phone_number).to be_nil
+      expect(person.given_name).to be_nil
+      expect(person.family_name).to be_nil
+      expect(person.display_name).to be_nil
+      expect(person.description).to be_nil
     end
 
     it "doesn't delete if not logged in as target person" do
