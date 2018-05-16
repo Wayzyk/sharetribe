@@ -368,7 +368,7 @@ class Listing < ApplicationRecord
       deleted: true
     )
     listings.each do |listing|
-      listing.location.destroy if listing.location
+      listing.location&.destroy
     end
     ids = listings.pluck(:id)
     ListingImage.where(listing_id: ids).destroy_all

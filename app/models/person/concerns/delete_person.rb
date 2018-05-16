@@ -32,7 +32,7 @@ module DeletePerson
           person.emails.destroy_all
 
           # Delete location
-          person.location.destroy if person.location
+          person.location&.destroy
 
           # Delete avatar
           person.image.destroy
